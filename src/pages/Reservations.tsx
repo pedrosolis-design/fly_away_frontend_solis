@@ -14,10 +14,10 @@ interface ReservationDetail {
 }
 
 export default function Reservations() {
-  const meta = JSON.parse(localStorage.getItem("reservationsMeta") || "{}");
   const [reservations, setReservations] = useState<ReservationDetail[]>([]);
   const [selected, setSelected] = useState<ReservationDetail | null>(null);
   const [message, setMessage] = useState("");
+  const meta = JSON.parse(localStorage.getItem("reservationsMeta") || "{}");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -54,57 +54,106 @@ export default function Reservations() {
     dt ? new Date(dt).toLocaleString("es-PE") : "-";
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Mis Reservas</h1>
-      {message && <p className="text-red-500">{message}</p>}
+    <div className="min-h-screen bg-gray-50 px-6 py-10">
+      <div className="max-w-4xl mx-auto">
 
-      {reservations.length === 0 && !message ? (
-        <p className="text-gray-500">No tienes reservas aún.</p>
-      ) : (
-        <table className="table-auto border-collapse border w-full text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Número de Vuelo</th>
-              <th className="border px-4 py-2">Aerolínea</th>
-              <th className="border px-4 py-2">Salida</th>
-              <th className="border px-4 py-2">Fecha Reserva</th>
-              <th className="border px-4 py-2">Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reservations.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50">
-                <td className="border px-4 py-2">{r.flightNumber}</td>
-                <td className="border px-4 py-2">{meta[r.id]?.airlineName || "-"}</td>
-                <td className="border px-4 py-2">{formatDate(r.estDepartureTime)}</td>
-                <td className="border px-4 py-2">{formatDate(r.bookingDate)}</td>
-                <td className="border px-4 py-2">
-                  <button
-                    onClick={() => setSelected(r)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700"
-                  >
-                    Ver detalle
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {selected && (
-        <div className="mt-6 p-4 border rounded bg-gray-50">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-xl font-bold">Detalle de Reserva #{selected.id}</h2>
-            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600">✕</button>
-          </div>
-          <p><strong>Número de Vuelo:</strong> {selected.flightNumber}</p>
-          <p><strong>Aerolínea:</strong> {meta[selected.id]?.airlineName || "-"}</p>
-          <p><strong>Salida:</strong> {formatDate(selected.estDepartureTime)}</p>
-          <p><strong>Llegada:</strong> {formatDate(selected.estArrivalTime)}</p>
-          <p><strong>Fecha de Reserva:</strong> {formatDate(selected.bookingDate)}</p>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-blue-700">🎫 Mis Reservas</h1>
+          <p className="text-gray-500 text-sm mt-1">Historial de tus vuelos reservados</p>
         </div>
-      )}
+
+        {message && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+            {message}
+          </div>
+        )}
+
+        {reservations.length === 0 && !message ? (
+          <div className="text-center text-gray-400 py-16">
+            <div className="text-5xl mb-3">🛬</div>
+            <p className="text-lg">No tienes reservas aún.</p>
+            <a href="/search" className="text-blue-600 text-sm hover:underline mt-2 inline-block">
+              Buscar vuelos disponibles
+            </a>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left">Número de Vuelo</th>
+                  <th className="px-4 py-3 text-left">Aerolínea</th>
+                  <th className="px-4 py-3 text-left">Salida</th>
+                  <th className="px-4 py-3 text-left">Fecha Reserva</th>
+                  <th className="px-4 py-3 text-center">Detalle</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((r, i) => (
+                  <tr key={r.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-4 py-3 font-medium text-blue-700">{r.flightNumber}</td>
+                    <td className="px-4 py-3">{meta[r.id]?.airlineName || "-"}</td>
+                    <td className="px-4 py-3">{formatDate(r.estDepartureTime)}</td>
+                    <td className="px-4 py-3">{formatDate(r.bookingDate)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => setSelected(r)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition"
+                      >
+                        Ver detalle
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Modal detalle */}
+        {selected && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+              <button
+                onClick={() => setSelected(null)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
+              >
+                ✕
+              </button>
+              <h2 className="text-xl font-bold text-blue-700 mb-4">
+                🎫 Detalle de Reserva #{selected.id}
+              </h2>
+              <div className="flex flex-col gap-2 text-sm text-gray-700">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Número de Vuelo</span>
+                  <span>{selected.flightNumber}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Aerolínea</span>
+                  <span>{meta[selected.id]?.airlineName || "-"}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Salida</span>
+                  <span>{formatDate(selected.estDepartureTime)}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Llegada</span>
+                  <span>{formatDate(selected.estArrivalTime)}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Pasajero</span>
+                  <span>{selected.customerFirstName} {selected.customerLastName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Fecha de Reserva</span>
+                  <span>{formatDate(selected.bookingDate)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
