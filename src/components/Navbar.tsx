@@ -26,32 +26,56 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white px-6 py-3 flex justify-between items-center">
-      <div className="flex gap-6">
+    <nav className="bg-blue-700 text-white px-8 py-4 flex justify-between items-center shadow-md">
+      {/* Logo */}
+      <div className="flex items-center gap-2 font-bold text-lg tracking-wide">
+        <span>✈️</span>
+        <span>Fly Away</span>
+      </div>
+
+      {/* Links */}
+      <div className="flex items-center gap-6 text-sm font-medium">
         {!token && (
           <>
-            <Link to="/register" className="hover:underline">Registro</Link>
-            <Link to="/login" className="hover:underline">Login</Link>
+            <Link to="/register" className="hover:text-blue-200 transition">
+              Registro
+            </Link>
+            <Link
+              to="/login"
+              className="bg-white text-blue-700 px-4 py-1.5 rounded-lg hover:bg-blue-100 transition font-semibold"
+            >
+              Login
+            </Link>
           </>
         )}
         {token && (
           <>
-            <Link to="/search" className="hover:underline">Buscar Vuelos</Link>
-            <Link to="/reservations" className="hover:underline">Mis Reservas</Link>
+            <Link to="/search" className="hover:text-blue-200 transition">
+              Buscar Vuelos
+            </Link>
+            <Link to="/reservations" className="hover:text-blue-200 transition">
+              Mis Reservas
+            </Link>
           </>
         )}
       </div>
-      <div className="flex items-center gap-6">
-        {token && username && <span className="text-sm">Bienvenido, {username}</span>}
-        {token && (
+
+      {/* Usuario y logout */}
+      {token && (
+        <div className="flex items-center gap-4 text-sm">
+          {username && (
+            <span className="text-blue-200">
+              Bienvenido, <span className="text-white font-semibold">{username}</span>
+            </span>
+          )}
           <button
             onClick={handleLogout}
-            className="bg-red-500 px-3 py-1 rounded hover:bg-red-700 text-sm"
+            className="bg-red-500 hover:bg-red-600 px-4 py-1.5 rounded-lg font-semibold transition"
           >
             Logout
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   );
 }
